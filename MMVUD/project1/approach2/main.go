@@ -63,7 +63,7 @@ func main() {
 		}
 	}
 
-	fmt.Println(string(xorBytes(asciiTarget, key)))
+	fmt.Println(string(xorBytes(asciiTarget, key))) // The secuet message is: Whn using a stream cipher, never use the key more than once
 }
 
 func xorBytes(a, b []byte) []byte {
