@@ -40,8 +40,8 @@ func (t Trivium) State(i uint64) uint64 {
 	return res
 }
 
-func (t *Trivium) NextBits(n uint64) uint64 {
-	var bitmask uint64 = (1 << n) - 1 // 0000...0000 11..11 (n bit 1)
+func (t *Trivium) NextBit() uint64 {
+	var bitmask uint64 = (1 << 1) - 1 // 0000...0001
 	// t1 ← s66 + s93
 	t1 := t.State(66) ^ t.State(93)
 	// t2 ← s162 + s177
@@ -65,17 +65,17 @@ func (t *Trivium) NextBits(n uint64) uint64 {
 	t3 &= bitmask
 
 	// shift
-	t.state[4] = (t.state[4] >> n) | (t.state[3] << (wordSize - n))
-	t.state[3] = (t.state[3] >> n) | (t.state[2] << (wordSize - n))
-	t.state[2] = (t.state[2] >> n) | (t.state[1] << (wordSize - n))
-	t.state[1] = (t.state[1] >> n) | (t.state[0] << (wordSize - n))
-	t.state[0] = (t.state[0] >> n) | (t3 << (wordSize - n)) // (s1, s2, . . . , s93) ← (t3, s1, . . . , s92)
+	t.state[4] = (t.state[4] >> 1) | (t.state[3] << (wordSize - 1))
+	t.state[3] = (t.state[3] >> 1) | (t.state[2] << (wordSize - 1))
+	t.state[2] = (t.state[2] >> 1) | (t.state[1] << (wordSize - 1))
+	t.state[1] = (t.state[1] >> 1) | (t.state[0] << (wordSize - 1))
+	t.state[0] = (t.state[0] >> 1) | (t3 << (wordSize - 1)) // (s1, s2, . . . , s93) ← (t3, s1, . . . , s92)
 
 	// update
-	n94 := 92 + n                  //
+	n94 := uint64(92 + 1)          //
 	ni94 := n94 >> 6               // array index
 	nsh94 := mask - (n94 & mask)   //
-	n178 := 176 + n                //
+	n178 := uint64(176 + 1)        //
 	ni178 := n178 >> 6             //
 	nsh178 := mask - (n178 & mask) //
 
@@ -97,7 +97,14 @@ func (t *Trivium) NextBits(n uint64) uint64 {
 }
 
 func (t *Trivium) NextByte() byte {
-	return byte(t.NextBits(8))
+	var next uint8
+
+	for i := 0; i < 8; i++ {
+		nextBit := t.NextBit()
+		next |= uint8(nextBit) << i
+	}
+
+	return byte(next)
 }
 
 // InitTrivium 80 bits key length and initial valuesu
@@ -139,7 +146,7 @@ func InitTrivium(key, iv [10]byte) *Trivium {
 
 	// warm-up
 	for i := 0; i < 4*288; i++ {
-		trivium.NextBits(1)
+		trivium.NextBit()
 	}
 
 	return &trivium

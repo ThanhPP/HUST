@@ -7,14 +7,6 @@ import (
 	"os"
 )
 
-func PrintBitByteSlice(msg string, b ...byte) {
-	fmt.Printf("%-10s: ", msg)
-	for i := range b {
-		fmt.Printf("%08b ", b[i])
-	}
-	fmt.Printf("\n")
-}
-
 func main() {
 	var (
 		key         = "B4B5B6B7B8B9BABBBCBD" // 10110100 10110101 10110110 10110111 10111000 10111001 10111010 10111011 10111100 10111101
@@ -28,12 +20,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	PrintBitByteSlice("key", keyB...)
 	ivB, err := hex.DecodeString(iv)
 	if err != nil {
 		panic(err)
 	}
-	PrintBitByteSlice("iv", ivB...)
 
 	// encryption
 	if err := Encrypt(keyB, ivB, clearFile, cipherFile); err != nil {
@@ -43,6 +33,42 @@ func main() {
 	// decryption
 	if err := Decrypt(keyB, cipherFile, decryptFile); err != nil {
 		panic(fmt.Errorf("decrypt error: %v", err))
+	}
+}
+
+func Test() {
+	var (
+		key = "B4B5B6B7B8B9BABBBCBD" // 10110100 10110101 10110110 10110111 10111000 10111001 10111010 10111011 10111100 10111101
+		iv  = "B9BABBBCBD5B6B7B8B4B"
+	)
+
+	keyB, err := hex.DecodeString(key)
+	if err != nil {
+		panic(err)
+	}
+	PrintBitByteSlice("key", keyB...)
+	ivB, err := hex.DecodeString(iv)
+	if err != nil {
+		panic(err)
+	}
+	PrintBitByteSlice("iv", ivB...)
+
+	// init the trivium
+	var (
+		inputKey [10]byte
+		inputIV  [10]byte
+	)
+	for i := 0; i < 10; i++ {
+		inputKey[i] = keyB[i]
+		inputIV[i] = ivB[i]
+	}
+	t := InitTrivium(inputKey, inputIV)
+	var next uint8
+	for i := 0; i < 8; i++ {
+		nextBit := t.NextBit()
+		next |= uint8(nextBit) << i
+		PrintBitByteSlice("next byte", next)
+		PrintBitUInt64("next 1bit", nextBit)
 	}
 }
 
@@ -59,7 +85,6 @@ func Encrypt(key, iv []byte, clearFile, cipherFile string) error {
 	trivium := InitTrivium(inputKey, inputIV)
 
 	// create the cipher file
-
 	cipherf, err := os.Create(cipherFile)
 	if err != nil {
 		return err
@@ -79,6 +104,7 @@ func Encrypt(key, iv []byte, clearFile, cipherFile string) error {
 	var (
 		buffer = make([]byte, 1)
 	)
+
 	for {
 		n, err := clearf.Read(buffer)
 		if err == io.EOF {
@@ -91,7 +117,8 @@ func Encrypt(key, iv []byte, clearFile, cipherFile string) error {
 			break
 		}
 		for i := range buffer {
-			buffer[i] ^= trivium.NextByte()
+			next := trivium.NextByte()
+			buffer[i] ^= next
 			hexCipher := hex.EncodeToString(buffer)
 			cipherf.WriteString(hexCipher)
 		}
