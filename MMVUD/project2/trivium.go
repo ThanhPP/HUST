@@ -64,12 +64,12 @@ func (t *Trivium) NextBit() uint64 {
 	t3 ^= ((t.State(286) & t.State(287)) ^ t.State(69))
 	t3 &= bitmask
 
-	// shift
+	// shift -> (s1, s2, . . . , s93) ← (t3, s1, . . . , s92)
 	t.state[4] = (t.state[4] >> 1) | (t.state[3] << (wordSize - 1))
 	t.state[3] = (t.state[3] >> 1) | (t.state[2] << (wordSize - 1))
 	t.state[2] = (t.state[2] >> 1) | (t.state[1] << (wordSize - 1))
 	t.state[1] = (t.state[1] >> 1) | (t.state[0] << (wordSize - 1))
-	t.state[0] = (t.state[0] >> 1) | (t3 << (wordSize - 1)) // (s1, s2, . . . , s93) ← (t3, s1, . . . , s92)
+	t.state[0] = (t.state[0] >> 1) | (t3 << (wordSize - 1))
 
 	// update
 	n94 := uint64(92 + 1)          //
