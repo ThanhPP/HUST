@@ -27,7 +27,7 @@ func (t Trivium) ArrayIdxContainsState(i uint64) uint64 {
 	return index
 }
 
-// Index returns the state at index i
+// State returns the state at index i
 func (t Trivium) State(i uint64) uint64 {
 	var (
 		shift = uint64(mask - uint64(i-1)&mask) // number of shifts to get to the right bit
