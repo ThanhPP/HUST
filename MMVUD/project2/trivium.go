@@ -3,8 +3,8 @@ package main
 import "fmt"
 
 const (
-	wordSize uint64 = 1 << 6       // 0000...0100 0000 - 64
-	mask     uint64 = (1 << 6) - 1 // 0000...0011 1111 - 63
+	wordSize uint64 = 1 << 6       // 0000...0100 0000 = 64
+	mask     uint64 = (1 << 6) - 1 // 0000...0011 1111 = 63
 )
 
 // 288-bit internal state
@@ -34,8 +34,7 @@ func (t Trivium) State(i uint64) uint64 {
 		res   uint64
 	)
 
-	res |= (t.state[t.ArrayIdxContainsState(i)] >> shift)                // get the first i bits of the array
-	res |= (t.state[t.ArrayIdxContainsState(i-1)] << (wordSize - shift)) //
+	res |= (t.state[t.ArrayIdxContainsState(i)] >> shift) // i'th bit
 
 	return res
 }
@@ -71,27 +70,22 @@ func (t *Trivium) NextBit() uint64 {
 	t.state[1] = (t.state[1] >> 1) | (t.state[0] << (wordSize - 1))
 	t.state[0] = (t.state[0] >> 1) | (t3 << (wordSize - 1))
 
-	// update
-	n94 := uint64(92 + 1)          //
-	ni94 := n94 >> 6               // array index
-	nsh94 := mask - (n94 & mask)   //
-	n178 := uint64(176 + 1)        //
-	ni178 := n178 >> 6             //
-	nsh178 := mask - (n178 & mask) //
+	// (s94, s95, . . . , s177) ← (t1, s94, . . . , s176)
+	n94 := uint64(93)               // real index
+	nidx94 := n94 >> 6              // array index
+	nshift94 := mask - (n94 & mask) // shift to get to the 94th bit
 
-	t.state[ni94] = t.state[ni94] &^ (bitmask << nsh94)
-	t.state[ni94] |= t1 << nsh94
-	// overlap across word boundaries
-	arrayIdx94 := t.ArrayIdxContainsState(94)
-	t.state[arrayIdx94] |= t.state[arrayIdx94] &^ (bitmask >> (wordSize - nsh94))
-	t.state[arrayIdx94] |= t1 >> (wordSize - nsh94) // (s94, s95, . . . , s177) ← (t1, s94, . . . , s176)
+	// insert
+	t.state[nidx94] = t.state[nidx94] &^ (bitmask << nshift94) // clear
+	t.state[nidx94] |= t1 << nshift94                          // insert
 
-	t.state[ni178] = t.state[ni178] &^ (bitmask << nsh178)
-	t.state[ni178] |= t2 << nsh178
-	// overlap across word boundaries
-	arrayIdx178 := t.ArrayIdxContainsState(94)
-	t.state[arrayIdx178] = t.state[arrayIdx178] &^ (bitmask >> (wordSize - nsh178))
-	t.state[arrayIdx178] |= t2 >> (wordSize - nsh178) // (s178, s279, . . . , s288) ← (t2, s178, . . . , s287)
+	// (s178, s279, . . . , s288) ← (t2, s178, . . . , s287)
+	n178 := uint64(177)               // real index
+	nidx178 := n178 >> 6              // array index
+	nshift178 := mask - (n178 & mask) // shift to get to the 178th bit
+	// insert
+	t.state[nidx178] = t.state[nidx178] &^ (bitmask << nshift178) // clear
+	t.state[nidx178] |= t2 << nshift178                           // insert
 
 	return z
 }
@@ -112,32 +106,32 @@ func InitTrivium(key, iv [10]byte) *Trivium {
 	var state [5]uint64
 
 	// load the 80-bit key into 0 to 80 states - (s1, s2, . . . , s93) ← (K1, . . . , K80, 0, . . . , 0)
-	state[0] |= (uint64(ReverseBytes(key[0])) << 56) // 1 - 8
-	state[0] |= (uint64(ReverseBytes(key[1])) << 48) // 9 - 16
-	state[0] |= (uint64(ReverseBytes(key[2])) << 40) // 17 - 24
-	state[0] |= (uint64(ReverseBytes(key[3])) << 32) // 25 - 32
+	state[0] |= (uint64((key[0])) << 56) // 1 - 8
+	state[0] |= (uint64((key[1])) << 48) // 9 - 16
+	state[0] |= (uint64((key[2])) << 40) // 17 - 24
+	state[0] |= (uint64((key[3])) << 32) // 25 - 32
 
-	state[0] |= (uint64(ReverseBytes(key[4])) << 24) // 33 - 40
-	state[0] |= (uint64(ReverseBytes(key[5])) << 16) // 41 - 48
-	state[0] |= (uint64(ReverseBytes(key[6])) << 8)  // 49 - 56
-	state[0] |= (uint64(ReverseBytes(key[7])))       // 57 - 64
+	state[0] |= (uint64((key[4])) << 24) // 33 - 40
+	state[0] |= (uint64((key[5])) << 16) // 41 - 48
+	state[0] |= (uint64((key[6])) << 8)  // 49 - 56
+	state[0] |= (uint64((key[7])))       // 57 - 64
 
-	state[1] |= (uint64(ReverseBytes(key[8])) << 56) // 65 - 72 (1 - 8)
-	state[1] |= (uint64(ReverseBytes(key[9])) << 48) // 73 - 81 (9 - 16)
+	state[1] |= (uint64((key[8])) << 56) // 65 - 72 (1 - 8)
+	state[1] |= (uint64((key[9])) << 48) // 73 - 81 (9 - 16)
 
 	// load the 80-bit initial value into 94 - 174 states - (s94, s95, . . . , s177) ← (IV1, . . . , IV80, 0, . . . , 0)
-	state[1] |= (uint64(ReverseBytes(iv[0])) << 27) // 94 - 102 (29 - 37)
-	state[1] |= (uint64(ReverseBytes(iv[1])) << 19) // 102 - 110 (37 - 45)
-	state[1] |= (uint64(ReverseBytes(iv[2])) << 11) // 111 - 119 (45 - 53)
-	state[1] |= (uint64(ReverseBytes(iv[3])) << 3)  // 120 - 128 (53 - 61)
-	state[1] |= (uint64(ReverseBytes(iv[4])) >> 5)  // 129 - 136 (61 - 64)
+	state[1] |= (uint64((iv[0])) << 27) // 94 - 102 (29 - 37)
+	state[1] |= (uint64((iv[1])) << 19) // 102 - 110 (37 - 45)
+	state[1] |= (uint64((iv[2])) << 11) // 111 - 119 (45 - 53)
+	state[1] |= (uint64((iv[3])) << 3)  // 120 - 128 (53 - 61)
+	state[1] |= (uint64((iv[4])) >> 5)  // 129 - 136 (61 - 64)
 
-	state[2] |= (uint64(ReverseBytes(iv[4])) << 59) // 137 - 141 (1 - 5)
-	state[2] |= (uint64(ReverseBytes(iv[5])) << 51) // 142 - 149 (6 - 13)
-	state[2] |= (uint64(ReverseBytes(iv[6])) << 43) // 149 - 156 (14 - 21)
-	state[2] |= (uint64(ReverseBytes(iv[7])) << 35) // 156 - 163 (22 - 29)
-	state[2] |= (uint64(ReverseBytes(iv[8])) << 27) // 164 - 171 (30 - 37)
-	state[2] |= (uint64(ReverseBytes(iv[9])) << 19) // 172 - 173 (38 - 45)
+	state[2] |= (uint64((iv[4])) << 59) // 137 - 141 (1 - 5)
+	state[2] |= (uint64((iv[5])) << 51) // 142 - 149 (6 - 13)
+	state[2] |= (uint64((iv[6])) << 43) // 149 - 156 (14 - 21)
+	state[2] |= (uint64((iv[7])) << 35) // 156 - 163 (22 - 29)
+	state[2] |= (uint64((iv[8])) << 27) // 164 - 171 (30 - 37)
+	state[2] |= (uint64((iv[9])) << 19) // 172 - 173 (38 - 45)
 
 	// set state 286 - 288 to 1 - (s178, s279, . . . , s288) ← (0, . . . , 0, 1, 1, 1)
 	state[4] = uint64(7) << 32 // 286 - 288
@@ -150,19 +144,4 @@ func InitTrivium(key, iv [10]byte) *Trivium {
 	}
 
 	return &trivium
-}
-
-// abcd efgh -> hgfe dcba
-func ReverseBytes(b byte) byte {
-	var newB byte
-	newB |= ((b & 0x1) << 7)  // h000 0000
-	newB |= ((b & 0x2) << 5)  // 0g00 0000
-	newB |= ((b & 0x4) << 3)  // 00f0 0000
-	newB |= ((b & 0x8) << 1)  // 000g 0000
-	newB |= ((b & 0x80) >> 7) // 0000 000a
-	newB |= ((b & 0x40) >> 5) // 0000 00b0
-	newB |= ((b & 0x20) >> 3) // 0000 0c00
-	newB |= ((b & 0x10) >> 1) // 0000 d000
-
-	return newB // hgfe dcba
 }
