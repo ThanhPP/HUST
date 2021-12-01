@@ -6,7 +6,7 @@
 
 ### [CBC mode](https://github.com/thanhpp/HUST/tree/main/MMVUD/project3/cbcmode)
 - Sơ đồ giải mã
-  - ![](CBCDecrypt.png)
+  - ![](https://github.com/thanhpp/HUST/blob/main/MMVUD/project3/CBCDecrypt.png)
 - Giải thích thuật toán
   - Decode hexa về binary của ciphertext, và key
   - Gỡ IV được thêm vào tại đầu của ciphertext (sizeIV == sizeBlock)
@@ -18,7 +18,7 @@
 
 ### [CTR mode](https://github.com/thanhpp/HUST/tree/main/MMVUD/project3/ctrmode)
 - Sơ đồ giải mã
-  - ![](CTRDecrypt.png)
+  - ![](https://github.com/thanhpp/HUST/blob/main/MMVUD/project3/CTRDecrypt.png)
 - Giải thích thuật toán
   - Decode hexa về binary của ciphertext, và key
   - Gỡ IV được thêm vào tại đầu của ciphertext (sizeIV == sizeBlock)
