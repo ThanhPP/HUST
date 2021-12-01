@@ -72,14 +72,14 @@ func printBytes(bytes []byte) {
 }
 
 func CBCDecrypt(ciphertext []byte, key []byte) []byte {
+	// the plaintext will be written here
+	var plaintext []byte
+
 	// create a new AES cipher with the given key
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
 	}
-
-	// the plaintext will be written here
-	var plaintext []byte
 
 	// get the initial value (IV)
 	// 16-byte encryption IV is chosen at random and is prepended to the ciphertext
@@ -91,30 +91,30 @@ func CBCDecrypt(ciphertext []byte, key []byte) []byte {
 	// each block of the aes cipher is 16 bytes long
 	for i := 0; i < len(ciphertext); i += aes.BlockSize {
 		// get a block from the ciphertext
-		blockCiphertext := ciphertext[i : i+aes.BlockSize]
+		ciphertextBlock := ciphertext[i : i+aes.BlockSize]
 
 		// create a plaintext block holder
-		var blockPlaintext = make([]byte, aes.BlockSize)
+		var plaintextBlock = make([]byte, aes.BlockSize)
 
 		// decrypt the the ciphertext block and write it to the plaintext block holder
-		block.Decrypt(blockPlaintext, blockCiphertext)
+		block.Decrypt(plaintextBlock, ciphertextBlock)
 
 		if i > 0 {
 			// get the previous block of the ciphertext
-			prevBlock := ciphertext[i-aes.BlockSize : i]
+			prevCiphertextBlock := ciphertext[i-aes.BlockSize : i]
 			for j := 0; j < aes.BlockSize; j++ {
 				// xor the block of decrypted text with the previous block of the ciphertext
-				blockPlaintext[j] ^= prevBlock[j]
+				plaintextBlock[j] ^= prevCiphertextBlock[j]
 			}
 		} else {
 			// xor the first block of the decrypted with the IV
 			for j := 0; j < aes.BlockSize; j++ {
-				blockPlaintext[j] ^= iv[j]
+				plaintextBlock[j] ^= iv[j]
 			}
 		}
 
 		// append the decrypted block to the plaintext
-		plaintext = append(plaintext, blockPlaintext...)
+		plaintext = append(plaintext, plaintextBlock...)
 	}
 
 	return plaintext
