@@ -2,7 +2,7 @@
 id: FlDl9gx2mBtFM41D123aX
 title: C2-IntelligentAgents
 desc: ''
-updated: 1639911838296
+updated: 1639931739763
 created: 1639841130136
 ---
 
@@ -23,6 +23,11 @@ created: 1639841130136
   - [Agents](#agents)
   - [System](#system)
 - [Intelligent agent properties](#intelligent-agent-properties)
+  - [Agents with States](#agents-with-states)
+- [Task for Agents](#task-for-agents)
+  - [Utility functions](#utility-functions)
+  - [Optimal agents](#optimal-agents)
+  - [Task environment](#task-environment)
 
 # Autonomy
 - Tính tự trị
@@ -141,3 +146,78 @@ created: 1639841130136
   - ![](/assets/images/2021-12-19-18-00-52.png) (state to actions)
   - Reactive agent
     - Always do the **same thing** in the **same state**
+
+## Agents with States
+- ![](/assets/images/2021-12-19-22-43-54.png)
+- Agent's internal **data structure**
+  - Record information about the environment state & history
+- **See**: observe the environment
+  - ![](/assets/images/2021-12-19-22-44-54.png)
+  - Output is a percept (nhận thức)
+- **Action**: decision making
+  - ![](/assets/images/2021-12-19-22-48-24.png)
+  - Internal states -> actions
+- **Next**: 
+  - ![](/assets/images/2021-12-19-22-51-50.png)
+  - Internal States + percept => new internal states
+  - **Updates** the agent's view when it gets a **new percept**
+
+# Task for Agents
+
+## Utility functions
+- **Rewarding** agent with the state it brings out
+- A task specification
+  - A real number (reward) with every environment state
+  - ![](/assets/images/2021-12-19-22-56-27.png)
+- Local utility functions
+  - Assigning utilities to **individual states**
+  - Difficult to specify a **long term view**
+  - **Reinforcement** learning: A **discount** for states later on
+- Sequential decision making
+  - Utility gained depends on the route taken
+- Utilities over Runs
+  - ![](/assets/images/2021-12-19-23-01-28.png)
+  - Assign utility for runs
+- Expected utility
+  - Probality that run _r_ occurs when agent _Ag_ is placed in the enviroment _Env_
+    - ![](/assets/images/2021-12-19-23-04-15.png)
+  - ![](/assets/images/2021-12-19-23-04-50.png)
+    - Utility of each run
+    - Possibility of each run
+
+## Optimal agents
+- Maximizes expected utility
+  - ![](/assets/images/2021-12-19-23-08-11.png)
+- Do the best **on average**
+- Bounded optimal agents
+  - Some agents **can not be implemented**
+  - Include only those agents tthat can be implemented on **machine m**
+    - ![](/assets/images/2021-12-19-23-11-13.png)
+  - ![](/assets/images/2021-12-19-23-10-54.png)
+
+## Task environment
+- Predicate task specification: Assign 0/1 (true/false | succeed/failed) to a run
+  - ![](/assets/images/2021-12-19-23-13-26.png)
+- Task environment:
+  - A pair ![](/assets/images/2021-12-19-23-14-41.png)
+    - ![](/assets/images/2021-12-19-23-14-17.png)
+    - Environment
+    - Task specification
+  - Specifies
+    - The properties of [the system](#system) the agent will inhabit (occupy)
+    - The **criteria** by which an agent will be **judged**
+- A set of runs of agent _Ag_ in environment _Env_ that satisfy _$\psi$_
+  - ![](/assets/images/2021-12-19-23-23-52.png) 
+  - Agent _Ag_ succeeds in task environment $<Env, \psi>$
+    - ![](/assets/images/2021-12-19-23-27-12.png)
+    - An agent succeeds if **every run satisfies the specification of the agent**
+      - ![](/assets/images/2021-12-19-23-29-32.png)
+    - More optimistic: succeed = at least a successful run
+      - ![](/assets/images/2021-12-19-23-29-18.png)
+- The probability of success
+  - Non-deterministic: the state transform function returns **a set of possible states**
+  - ![](/assets/images/2021-12-19-23-34-14.png)
+    - The sum of probabilities of every run that satisfy $\psi$ when agent _Ag_ is placed in environment _Env_
+- Types
+  - Achievement: if the agent can **force the environment** into one of the goal states
+  - Maintenance: if the agent **never forced into** one of the fail states
