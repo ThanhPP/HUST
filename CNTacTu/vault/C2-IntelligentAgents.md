@@ -2,7 +2,7 @@
 id: FlDl9gx2mBtFM41D123aX
 title: C2-IntelligentAgents
 desc: ''
-updated: 1639891954124
+updated: 1639911838296
 created: 1639841130136
 ---
 
@@ -17,6 +17,12 @@ created: 1639841130136
   - [Pro-active](#pro-active)
   - [Social ability](#social-ability)
   - [Other properties](#other-properties)
+- [Intentional System](#intentional-system)
+- [Abstract architecture](#abstract-architecture)
+  - [Environments](#environments)
+  - [Agents](#agents)
+  - [System](#system)
+- [Intelligent agent properties](#intelligent-agent-properties)
 
 # Autonomy
 - Tính tự trị
@@ -89,3 +95,49 @@ created: 1639841130136
 - Veracity (xác thực): know the communication failures
 - Benevolence (nhân từ): to help or not to help
 - Learning/Adaption
+
+# Intentional System
+- Folk psychology:
+  - **Human behaviour is predicted** and explainend through the attribution of **attitudes**.
+  - Attitudes = intentional notions
+
+# Abstract architecture
+- The world 
+  - Finite set E of discrete, instantaneous (tức thời) **states** 
+    - ![](/assets/images/2021-12-19-17-09-25.png)
+- Agents have a set of **possible actions** to transform the state of the world
+  - ![](/assets/images/2021-12-19-17-10-59.png)
+- A **run** of an agent is a **sequence** of interleaved (xen kẽ) _world states and actions_
+  - ![](/assets/images/2021-12-19-17-12-45.png)  
+  - Runs can end with a state or an action
+    - ![](/assets/images/2021-12-19-17-21-18.png)
+
+## Environments
+- Properties
+  - History dependent
+  - Non-determistic
+- State transformer function: environment's behaviour
+  - ![](/assets/images/2021-12-19-17-24-49.png)
+- ![](/assets/images/2021-12-19-17-45-14.png)
+  - E: set of states
+  - e[0]: initial state
+  - T: state transformer function
+
+## Agents
+- ![](/assets/images/2021-12-19-17-47-19.png)
+  - Agent = function which maps **runs to actions**
+  - Ag: the set of all agents
+
+## System
+- ![](/assets/images/2021-12-19-17-49-38.png)
+- A system = an agent + an environment
+- Associate with a set of **possible runs**
+- ![](/assets/images/2021-12-19-17-55-43.png)
+
+# Intelligent agent properties
+- Deliberative (chủ ý): Agent will reach a **different decision** when it reach the **same state** by **different routes** 
+- Purely reactive
+  - Without history references
+  - ![](/assets/images/2021-12-19-18-00-52.png) (state to actions)
+  - Reactive agent
+    - Always do the **same thing** in the **same state**
