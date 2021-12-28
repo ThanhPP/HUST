@@ -29,7 +29,7 @@ $ go mod tidy
 $ go build
 ```
 
-```bash
+```
 $ ./project4 -h
 project4 is a tool to calculate the hash of a file or compare file and hashes
 
@@ -55,7 +55,7 @@ Use "project4 [command] --help" for more information about a command.
 $ ./project4 calhash [File 1] [File 2] [File 3]
 ``` 
 
-```bash
+```
 $ ./project4 calhash birthday.mp4 main.go
 
 2021/12/29 02:01:49 file name: birthday.mp4
@@ -69,8 +69,9 @@ $ ./project4 calhash birthday.mp4 main.go
 $ ./project4 comparefiles [File 1] [File 2]
 ```
 
-```bash
+```
 $ ./project4 comparefiles birthday.mp4 main.go
+
 2021/12/29 02:02:46 file name: birthday.mp4
 2021/12/29 02:02:46 hash: 03c08f4ee0b576fe319338139c045c89c3e8e9409633bea29442e21425006ea8
 2021/12/29 02:02:46 file name: main.go
@@ -79,11 +80,12 @@ $ ./project4 comparefiles birthday.mp4 main.go
 ```
 
 #### So sánh file với giá hash có sẵn
-```bash
+```
 $ ./project4 comparehash --expected=[expected hash] [File]
 ```
 
-```bash
+```
+
 $ ./project4 comparehash --expected=03c08f4ee0b576fe319338139c045c89c3e8e9409633bea29442e21425006ea8 birthday.mp4
 2021/12/29 02:04:36 file name: birthday.mp4
 2021/12/29 02:04:36 hash:          03c08f4ee0b576fe319338139c045c89c3e8e9409633bea29442e21425006ea8
