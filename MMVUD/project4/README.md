@@ -25,6 +25,7 @@
 ## Mô tả cách sử dụng chương trình
 ### Build
 ```bash
+$ go mod init
 $ go mod tidy
 $ go build
 ```
