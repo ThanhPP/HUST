@@ -80,7 +80,7 @@ $ ./project4 comparefiles birthday.mp4 main.go
 2021/12/29 02:02:46 file1 hash == file2 hash: false
 ```
 
-#### So sánh file với giá hash có sẵn
+#### So sánh file với giá trị hash có sẵn
 ```
 $ ./project4 comparehash --expected=[expected hash] [File]
 ```
