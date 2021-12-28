@@ -85,8 +85,8 @@ $ ./project4 comparehash --expected=[expected hash] [File]
 ```
 
 ```
-
 $ ./project4 comparehash --expected=03c08f4ee0b576fe319338139c045c89c3e8e9409633bea29442e21425006ea8 birthday.mp4
+
 2021/12/29 02:04:36 file name: birthday.mp4
 2021/12/29 02:04:36 hash:          03c08f4ee0b576fe319338139c045c89c3e8e9409633bea29442e21425006ea8
 2021/12/29 02:04:36 expected hash: 03c08f4ee0b576fe319338139c045c89c3e8e9409633bea29442e21425006ea8
